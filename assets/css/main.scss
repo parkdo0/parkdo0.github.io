@@ -1047,7 +1047,7 @@ body {
    ========================================================================== */
 
 .floating-toc {
-  position: fixed;
+  position: fixed !important;
   top: 50%;
   right: var(--spacing-lg);
   transform: translateY(-50%);
@@ -1069,7 +1069,7 @@ body {
   }
   
   @media (min-width: 1025px) {
-    will-change: transform, top, opacity;
+    will-change: top, opacity;
     
     &.visible {
       opacity: 1;

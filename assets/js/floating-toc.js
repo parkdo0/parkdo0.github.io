@@ -1,8 +1,7 @@
-// Floating Table of Contents (성능 최적화 + 스크롤 따라다니기)
+// Floating Table of Contents (스크롤 따라다니기 - 수정)
 (function() {
   'use strict';
   
-  // device-detector가 로드될 때까지 기다림
   function initTOC() {
     // 모바일에서는 실행하지 않음
     if (window.DEVICE && (window.DEVICE.isMobile || window.DEVICE.isTablet)) {
@@ -15,7 +14,6 @@
     const tocNav = toc.querySelector('.toc-nav');
     if (!tocNav) return;
     
-    // Get all headings from post content
     const postContent = document.querySelector('.post-content');
     if (!postContent) return;
     
@@ -39,7 +37,6 @@
       a.textContent = heading.textContent;
       a.classList.add('toc-link');
       
-      // Add indentation based on heading level
       if (heading.tagName === 'H3') {
         a.style.paddingLeft = '1.5rem';
       } else if (heading.tagName === 'H4') {
@@ -54,7 +51,7 @@
     
     // Show TOC when scrolled
     function checkTocVisibility() {
-      const scrollPosition = window.pageYOffset || window.scrollY;
+      const scrollPosition = window.pageYOffset || window.scrollY || document.documentElement.scrollTop;
       const heroHeight = document.querySelector('.hero-section')?.offsetHeight || 0;
       
       if (scrollPosition > heroHeight + 200 || scrollPosition > 300) {
@@ -64,42 +61,42 @@
       }
     }
     
-    // Update TOC position to follow scroll
+    // Update TOC position to follow scroll - 핵심 수정
     function updateTocPosition() {
+      const scrollPosition = window.pageYOffset || window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const tocHeight = toc.offsetHeight || 300;
+      const headerHeight = 80;
+      
       if (!toc.classList.contains('visible')) {
-        // visible이 아니면 초기 위치로
         toc.style.top = '50%';
         toc.style.transform = 'translateY(-50%)';
         return;
       }
       
-      const windowHeight = window.innerHeight;
-      const tocHeight = toc.offsetHeight;
-      const headerHeight = 80;
-      const scrollTop = window.pageYOffset || window.scrollY;
+      // 화면 중앙 기준으로 위치 계산
+      const centerTop = scrollPosition + (windowHeight / 2) - (tocHeight / 2);
       
-      // TOC가 화면 밖으로 나가지 않도록 제한
+      // 경계 제한
       const maxTop = headerHeight + 20;
       const minTop = windowHeight - tocHeight - 20;
-      const centerTop = scrollTop + (windowHeight / 2) - (tocHeight / 2);
+      const targetTop = Math.max(maxTop, Math.min(minTop, centerTop));
       
-      // 범위 내에서 위치 조정
-      let targetTop = Math.max(maxTop, Math.min(minTop, centerTop));
-      
-      // top으로 위치 설정 (스크롤 따라다니기)
-      toc.style.top = targetTop + 'px';
-      toc.style.transform = 'none';
+      // !important로 강제 적용
+      toc.style.setProperty('top', targetTop + 'px', 'important');
+      toc.style.setProperty('transform', 'none', 'important');
+      toc.style.setProperty('position', 'fixed', 'important');
     }
     
     // Highlight active heading
     const links = tocNav.querySelectorAll('.toc-link');
     function highlightActiveHeading() {
-      const scrollPosition = (window.pageYOffset || window.scrollY) + 150;
+      const scrollPosition = (window.pageYOffset || window.scrollY || document.documentElement.scrollTop) + 150;
       
       let current = '';
       headings.forEach((heading) => {
         const rect = heading.getBoundingClientRect();
-        const headingTop = rect.top + (window.pageYOffset || window.scrollY);
+        const headingTop = rect.top + (window.pageYOffset || window.scrollY || document.documentElement.scrollTop);
         if (scrollPosition >= headingTop) {
           current = heading.id;
         }
@@ -123,7 +120,7 @@
         if (target) {
           const headerOffset = 100;
           const rect = target.getBoundingClientRect();
-          const elementPosition = rect.top + (window.pageYOffset || window.scrollY);
+          const elementPosition = rect.top + (window.pageYOffset || window.scrollY || document.documentElement.scrollTop);
           const offsetPosition = elementPosition - headerOffset;
           
           window.scrollTo({
@@ -134,7 +131,7 @@
       }
     });
     
-    // Update on scroll (throttled)
+    // Update on scroll
     let ticking = false;
     const scrollHandler = () => {
       if (!ticking) {
@@ -154,34 +151,35 @@
     }, { passive: true });
     
     // Initial check
-    checkTocVisibility();
-    updateTocPosition();
-    
-    // Cleanup
-    window.addEventListener('beforeunload', () => {
-      window.removeEventListener('scroll', scrollHandler);
-    });
+    setTimeout(() => {
+      checkTocVisibility();
+      updateTocPosition();
+    }, 100);
   }
   
-  // device-detector가 로드되었는지 확인
-  if (window.DEVICE) {
-    initTOC();
-  } else {
-    // device-detector가 아직 로드되지 않았으면 기다림
-    const checkDevice = setInterval(() => {
+  // DOMContentLoaded 또는 즉시 실행
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
       if (window.DEVICE) {
-        clearInterval(checkDevice);
         initTOC();
+      } else {
+        const checkDevice = setInterval(() => {
+          if (window.DEVICE) {
+            clearInterval(checkDevice);
+            initTOC();
+          }
+        }, 50);
+        setTimeout(() => {
+          clearInterval(checkDevice);
+          initTOC();
+        }, 1000);
       }
-    }, 50);
-    
-    // 최대 2초 대기
-    setTimeout(() => {
-      clearInterval(checkDevice);
-      if (!window.DEVICE) {
-        // device-detector가 없으면 데스크톱으로 가정하고 실행
-        initTOC();
-      }
-    }, 2000);
+    });
+  } else {
+    if (window.DEVICE) {
+      initTOC();
+    } else {
+      setTimeout(() => initTOC(), 100);
+    }
   }
 })();
