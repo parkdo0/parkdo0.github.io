@@ -1,4 +1,4 @@
-// Particles Background Effect
+// Particles Background Effect (성능 최적화)
 (function() {
   'use strict';
   
@@ -7,11 +7,13 @@
   
   const ctx = canvas.getContext('2d');
   let particles = [];
-  let animationId;
+  let animationId = null;
+  let isVisible = true;
+  let resizeTimeout = null;
   
   // Set canvas size (고해상도 최적화)
   function resizeCanvas() {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // 최대 2배로 제한
     const rect = canvas.getBoundingClientRect();
     
     // 실제 픽셀 크기
@@ -35,11 +37,28 @@
   resizeCanvas();
   
   // Throttle resize for performance
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
+  function handleResize() {
     clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(resizeCanvas, 250);
-  });
+    resizeTimeout = setTimeout(() => {
+      resizeCanvas();
+      initParticles();
+    }, 250);
+  }
+  
+  window.addEventListener('resize', handleResize, { passive: true });
+  
+  // Visibility API로 탭이 보이지 않을 때 애니메이션 중지
+  function handleVisibilityChange() {
+    isVisible = !document.hidden;
+    if (isVisible && !animationId) {
+      animate();
+    } else if (!isVisible && animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+  }
+  
+  document.addEventListener('visibilitychange', handleVisibilityChange);
   
   // Particle class
   class Particle {
@@ -76,32 +95,37 @@
   // Create particles (고해상도 최적화)
   function initParticles() {
     particles = [];
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const rect = canvas.getBoundingClientRect();
-    const baseCount = Math.floor((rect.width * rect.height) / 15000);
+    const baseCount = Math.floor((rect.width * rect.height) / 20000); // 파티클 수 감소
     // 고해상도에서는 파티클 수를 조정 (너무 많으면 성능 저하)
-    const particleCount = dpr > 1 ? Math.min(baseCount, 150) : baseCount;
+    const particleCount = Math.min(baseCount, 100); // 최대 100개로 제한
     
     for (let i = 0; i < particleCount; i++) {
       particles.push(new Particle());
     }
   }
   
-  // Connect nearby particles
+  // Connect nearby particles (최적화)
   function connectParticles() {
+    const maxDistance = 120;
+    const maxConnections = 3; // 각 파티클당 최대 연결 수
+    
     for (let i = 0; i < particles.length; i++) {
-      for (let j = i + 1; j < particles.length; j++) {
+      let connections = 0;
+      for (let j = i + 1; j < particles.length && connections < maxConnections; j++) {
         const dx = particles[i].x - particles[j].x;
         const dy = particles[i].y - particles[j].y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        if (distance < 120) {
+        if (distance < maxDistance) {
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(0, 217, 255, ${0.1 * (1 - distance / 120)})`;
+          ctx.strokeStyle = `rgba(0, 217, 255, ${0.1 * (1 - distance / maxDistance)})`;
           ctx.lineWidth = 0.5;
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
           ctx.stroke();
+          connections++;
         }
       }
     }
@@ -109,29 +133,17 @@
   
   // Animation loop (고해상도 최적화)
   function animate() {
-    // 고해상도에서 성능 최적화
-    const dpr = window.devicePixelRatio || 1;
-    if (dpr > 2) {
-      // 초고해상도에서는 연결선을 간소화
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-      });
-      
-      // 파티클 수가 많으면 연결선 생략
-      if (particles.length < 100) {
-        connectParticles();
-      }
-    } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-      });
-      
+    if (!isVisible) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(particle => {
+      particle.update();
+      particle.draw();
+    });
+    
+    // 파티클 수가 적을 때만 연결선 그리기
+    if (particles.length < 80) {
       connectParticles();
     }
     
@@ -140,6 +152,19 @@
   
   // Initialize
   initParticles();
-  animate();
+  if (isVisible) {
+    animate();
+  }
+  
+  // Cleanup
+  window.addEventListener('beforeunload', () => {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+    }
+    if (resizeTimeout) {
+      clearTimeout(resizeTimeout);
+    }
+    window.removeEventListener('resize', handleResize);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
+  });
 })();
-

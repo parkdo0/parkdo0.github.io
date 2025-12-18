@@ -1,4 +1,4 @@
-// Scroll Animations - Fade In & Slide Up
+// Scroll Animations - Fade In & Slide Up (성능 최적화)
 (function() {
   'use strict';
   
@@ -11,8 +11,8 @@
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('visible');
-        // Optional: unobserve after animation
-        // observer.unobserve(entry.target);
+        // 메모리 누수 방지: 애니메이션 후 unobserve
+        observer.unobserve(entry.target);
       }
     });
   }, observerOptions);
@@ -22,23 +22,24 @@
     const fadeInElements = document.querySelectorAll('.fade-in, .slide-up, [data-post-card]');
     
     fadeInElements.forEach((el, index) => {
-      // Add stagger delay
+      // Add stagger delay via animation-delay
       if (el.hasAttribute('data-post-card')) {
-        el.style.transitionDelay = `${index * 0.1}s`;
+        el.style.animationDelay = `${index * 0.1}s`;
         el.classList.add('fade-in');
       }
       observer.observe(el);
     });
   }
   
-  // Header scroll effect
+  // Header scroll effect (throttled)
   function initHeaderScroll() {
     const header = document.getElementById('site-header');
     if (!header) return;
     
+    let ticking = false;
     let lastScroll = 0;
     
-    window.addEventListener('scroll', () => {
+    const updateHeader = () => {
       const currentScroll = window.pageYOffset;
       
       if (currentScroll > 100) {
@@ -48,7 +49,20 @@
       }
       
       lastScroll = currentScroll;
-    });
+      ticking = false;
+    };
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateHeader);
+        ticking = true;
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initial check
+    updateHeader();
   }
   
   // Initialize on DOM ready
@@ -61,5 +75,9 @@
     initScrollAnimations();
     initHeaderScroll();
   }
+  
+  // Cleanup
+  window.addEventListener('beforeunload', () => {
+    observer.disconnect();
+  });
 })();
-

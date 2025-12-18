@@ -1,4 +1,4 @@
-// Floating Table of Contents
+// Floating Table of Contents (성능 최적화)
 (function() {
   'use strict';
   
@@ -57,10 +57,10 @@
     }
   }
   
-  // Highlight active heading
+  // Highlight active heading (캐싱으로 최적화)
+  const links = tocNav.querySelectorAll('.toc-link');
   function highlightActiveHeading() {
     const scrollPosition = window.pageYOffset + 150;
-    const links = tocNav.querySelectorAll('.toc-link');
     
     let current = '';
     headings.forEach((heading) => {
@@ -98,9 +98,9 @@
     }
   });
   
-  // Update on scroll
+  // Update on scroll (throttled)
   let ticking = false;
-  window.addEventListener('scroll', () => {
+  const scrollHandler = () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
         checkTocVisibility();
@@ -109,9 +109,15 @@
       });
       ticking = true;
     }
-  });
+  };
+  
+  window.addEventListener('scroll', scrollHandler, { passive: true });
   
   // Initial check
   checkTocVisibility();
+  
+  // Cleanup
+  window.addEventListener('beforeunload', () => {
+    window.removeEventListener('scroll', scrollHandler);
+  });
 })();
-

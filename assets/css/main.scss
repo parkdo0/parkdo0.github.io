@@ -143,6 +143,13 @@ body {
    Header & Navigation
    ========================================================================== */
 
+@keyframes headerScroll {
+  to {
+    padding: var(--spacing-sm) 0;
+    box-shadow: var(--shadow-md);
+  }
+}
+
 .site-header {
   position: fixed;
   top: 0;
@@ -153,17 +160,14 @@ body {
   background: rgba(10, 14, 26, 0.8);
   backdrop-filter: blur(20px) saturate(180%);
   border-bottom: 1px solid var(--color-border-secondary);
-  transition: all var(--transition-base);
   /* 고해상도 렌더링 최적화 */
-  will-change: transform, opacity;
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
 }
 
 .site-header.scrolled {
-  padding: var(--spacing-sm) 0;
-  box-shadow: var(--shadow-md);
+  animation: headerScroll 0.3s ease forwards;
 }
 
 .navbar-container {
@@ -214,11 +218,16 @@ body {
   }
 }
 
+@keyframes navbarLinkUnderline {
+  to {
+    width: 100%;
+  }
+}
+
 .navbar-link {
   color: var(--color-text-secondary);
   text-decoration: none;
   font-weight: var(--font-weight-medium);
-  transition: color var(--transition-base);
   position: relative;
   
   &::after {
@@ -229,14 +238,13 @@ body {
     width: 0;
     height: 2px;
     background: var(--color-accent-primary);
-    transition: width var(--transition-base);
   }
   
   &:hover {
     color: var(--color-text-primary);
     
     &::after {
-      width: 100%;
+      animation: navbarLinkUnderline 0.3s ease forwards;
     }
   }
 }
@@ -486,6 +494,20 @@ body {
   perspective: 1000px;
 }
 
+@keyframes cardHover {
+  to {
+    transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    border-color: var(--color-accent-primary);
+  }
+}
+
+@keyframes cardHoverBg {
+  to {
+    opacity: 1;
+  }
+}
+
 .post-card-inner {
   position: relative;
   height: 100%;
@@ -494,9 +516,9 @@ body {
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-lg);
-  transition: all var(--transition-base);
   transform-style: preserve-3d;
   overflow: hidden;
+  will-change: transform;
   
   &::before {
     content: '';
@@ -507,16 +529,13 @@ body {
     bottom: 0;
     background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), rgba(16, 185, 129, 0.1));
     opacity: 0;
-    transition: opacity var(--transition-base);
   }
   
   &:hover {
-    transform: translateY(-8px) rotateX(2deg) rotateY(2deg);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
-    border-color: var(--color-accent-primary);
+    animation: cardHover 0.3s ease forwards;
     
     &::before {
-      opacity: 1;
+      animation: cardHoverBg 0.3s ease forwards;
     }
   }
 }
@@ -571,6 +590,13 @@ body {
   z-index: 2;
 }
 
+@keyframes hoverEffect {
+  to {
+    width: 300px;
+    height: 300px;
+  }
+}
+
 .post-card-hover-effect {
   position: absolute;
   top: 50%;
@@ -580,13 +606,12 @@ body {
   background: radial-gradient(circle, rgba(0, 217, 255, 0.2), transparent);
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
   pointer-events: none;
+  will-change: width, height;
 }
 
 .post-card:hover .post-card-hover-effect {
-  width: 300px;
-  height: 300px;
+  animation: hoverEffect 0.6s ease forwards;
 }
 
 /* ==========================================================================
@@ -683,7 +708,8 @@ body {
   transform-origin: left;
   transform: scaleX(0);
   z-index: var(--z-floating);
-  transition: transform var(--transition-fast);
+  will-change: transform;
+  /* transform은 JavaScript로 직접 제어하므로 transition 제거 */
 }
 
 .post-container {
@@ -784,7 +810,9 @@ body {
     padding: 0.2em 0.4em;
     border-radius: 4px;
     font-size: 0.9em;
-    font-family: 'Courier New', monospace;
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
+    /* 성능 최적화 */
+    will-change: auto;
   }
   
   pre {
@@ -1112,26 +1140,44 @@ body {
   }
 }
 
-/* Scroll Animation Classes */
+/* Scroll Animation Classes - Keyframe 기반 */
+@keyframes fadeInUpAnimation {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUpAnimation {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .fade-in {
   opacity: 0;
   transform: translateY(30px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
   
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
+    animation: fadeInUpAnimation 0.6s ease forwards;
   }
 }
 
 .slide-up {
   opacity: 0;
   transform: translateY(50px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
   
   &.visible {
-    opacity: 1;
-    transform: translateY(0);
+    animation: slideUpAnimation 0.8s ease forwards;
   }
 }
 
@@ -1557,6 +1603,12 @@ body {
   }
 }
 
+@keyframes folderHeaderHover {
+  to {
+    background: rgba(0, 217, 255, 0.1);
+  }
+}
+
 .folder-header {
   display: flex;
   align-items: center;
@@ -1565,11 +1617,10 @@ body {
   background: rgba(0, 217, 255, 0.05);
   border-bottom: 1px solid var(--color-border-secondary);
   cursor: pointer;
-  transition: all var(--transition-base);
   user-select: none;
   
   &[data-folder-toggle]:hover {
-    background: rgba(0, 217, 255, 0.1);
+    animation: folderHeaderHover 0.2s ease forwards;
   }
 }
 
@@ -1598,16 +1649,22 @@ body {
   transition: transform var(--transition-base);
 }
 
+@keyframes folderOpen {
+  to {
+    max-height: 5000px;
+    padding: var(--spacing-xl);
+  }
+}
+
 .folder-content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease;
   padding: 0 var(--spacing-xl);
+  will-change: max-height, padding;
 }
 
 .folder-item.folder-open .folder-content {
-  max-height: 5000px;
-  padding: var(--spacing-xl);
+  animation: folderOpen 0.3s ease forwards;
 }
 
 .folder-posts {
@@ -1623,6 +1680,15 @@ body {
   margin: 0;
 }
 
+@keyframes folderPostHover {
+  to {
+    background: var(--color-bg-secondary);
+    border-color: var(--color-accent-primary);
+    transform: translateX(8px);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
 .folder-post-link {
   display: flex;
   align-items: center;
@@ -1633,13 +1699,10 @@ body {
   border-radius: var(--radius-md);
   text-decoration: none;
   color: var(--color-text-primary);
-  transition: all var(--transition-base);
+  will-change: transform;
   
   &:hover {
-    background: var(--color-bg-secondary);
-    border-color: var(--color-accent-primary);
-    transform: translateX(8px);
-    box-shadow: var(--shadow-sm);
+    animation: folderPostHover 0.3s ease forwards;
   }
 }
 
