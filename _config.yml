@@ -1,0 +1,14 @@
+title: 박도영의 기술 블로그
+description: 6년차 백엔드 개발자의 학습 기록
+author:
+  name: 박도영
+  email: qkrehdudhi@naver.com
+
+theme: minima
+markdown: kramdown
+
+github_username: parkdo0
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
