@@ -2,6 +2,11 @@
 (function() {
   'use strict';
   
+  // 모바일에서는 실행하지 않음
+  if (window.DEVICE && (window.DEVICE.isMobile || window.DEVICE.isTablet)) {
+    return;
+  }
+  
   const toc = document.getElementById('floating-toc');
   if (!toc) return;
   

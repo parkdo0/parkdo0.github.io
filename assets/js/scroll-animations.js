@@ -1,43 +1,51 @@
-// Scroll Animations - Fade In & Slide Up (성능 최적화)
+// Scroll Animations - Fade In & Slide Up (모바일 최적화)
 (function() {
   'use strict';
   
+  // 모바일에서는 애니메이션 간소화
+  const isMobile = window.DEVICE && window.DEVICE.isMobile;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  
   const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    threshold: isMobile ? 0.05 : 0.1,
+    rootMargin: isMobile ? '0px' : '0px 0px -50px 0px'
   };
   
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        // 메모리 누수 방지: 애니메이션 후 unobserve
+        if (reduceMotion) {
+          // 애니메이션 비활성화 설정이면 즉시 표시
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'none';
+        } else {
+          entry.target.classList.add('visible');
+        }
         observer.unobserve(entry.target);
       }
     });
   }, observerOptions);
   
-  // Observe elements with animation classes
   function initScrollAnimations() {
     const fadeInElements = document.querySelectorAll('.fade-in, .slide-up, [data-post-card]');
     
     fadeInElements.forEach((el, index) => {
-      // Add stagger delay via animation-delay
       if (el.hasAttribute('data-post-card')) {
-        el.style.animationDelay = `${index * 0.1}s`;
+        // 모바일에서는 delay 제거
+        if (!isMobile) {
+          el.style.animationDelay = `${index * 0.05}s`;
+        }
         el.classList.add('fade-in');
       }
       observer.observe(el);
     });
   }
   
-  // Header scroll effect (throttled)
   function initHeaderScroll() {
     const header = document.getElementById('site-header');
     if (!header) return;
     
     let ticking = false;
-    let lastScroll = 0;
     
     const updateHeader = () => {
       const currentScroll = window.pageYOffset;
@@ -48,7 +56,6 @@
         header.classList.remove('scrolled');
       }
       
-      lastScroll = currentScroll;
       ticking = false;
     };
     
@@ -60,12 +67,9 @@
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // Initial check
     updateHeader();
   }
   
-  // Initialize on DOM ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       initScrollAnimations();
@@ -76,7 +80,6 @@
     initHeaderScroll();
   }
   
-  // Cleanup
   window.addEventListener('beforeunload', () => {
     observer.disconnect();
   });

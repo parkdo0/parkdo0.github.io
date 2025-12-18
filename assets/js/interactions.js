@@ -1,11 +1,13 @@
-// 3D Tilt Effect for Post Cards (성능 최적화)
+// 3D Tilt Effect for Post Cards (데스크톱 전용)
 (function() {
   'use strict';
   
   let tiltHandlers = [];
   let rafId = null;
   
-  // Throttle function
+  // 모바일에서는 틸트 효과 비활성화
+  const enableTilt = window.DEVICE && window.DEVICE.isDesktop;
+  
   function throttle(func, limit) {
     let inThrottle;
     return function() {
@@ -19,7 +21,6 @@
     };
   }
   
-  // RequestAnimationFrame 기반 tilt 업데이트
   function updateTilt() {
     tiltHandlers.forEach(handler => {
       if (handler.needsUpdate) {
@@ -31,6 +32,8 @@
   }
   
   function initTiltEffect() {
+    if (!enableTilt) return; // 모바일에서는 실행 안 함
+    
     const cards = document.querySelectorAll('[data-post-card]');
     
     cards.forEach(card => {
@@ -64,7 +67,7 @@
         if (!rafId) {
           rafId = requestAnimationFrame(updateTilt);
         }
-      }, 16); // ~60fps
+      }, 16);
       
       const handleMouseLeave = () => {
         handler.inner.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
@@ -100,7 +103,6 @@
     toggle.addEventListener('click', handleToggle);
     document.addEventListener('click', handleClickOutside);
     
-    // Close menu when clicking a link
     const links = menu.querySelectorAll('.navbar-link');
     const handleLinkClick = () => {
       toggle.classList.remove('active');
@@ -137,7 +139,6 @@
     });
   }
   
-  // Cleanup function
   function cleanup() {
     if (rafId) {
       cancelAnimationFrame(rafId);
@@ -146,7 +147,7 @@
     tiltHandlers = [];
   }
   
-  // Initialize on DOM ready
+  // Initialize
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       initTiltEffect();
@@ -159,6 +160,5 @@
     initSmoothScroll();
   }
   
-  // Cleanup on page unload
   window.addEventListener('beforeunload', cleanup);
 })();

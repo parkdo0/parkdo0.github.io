@@ -96,14 +96,24 @@ body {
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
   overflow-x: hidden;
-  /* 고해상도 렌더링 최적화 */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-  /* 하드웨어 가속 */
-  transform: translateZ(0);
-  backface-visibility: hidden;
-  perspective: 1000px;
+  
+  /* 모바일에서는 하드웨어 가속 최소화 */
+  @media (max-width: 768px) {
+    text-rendering: auto;
+    transform: none;
+    backface-visibility: visible;
+    perspective: none;
+  }
+  
+  /* 데스크톱에서만 하드웨어 가속 */
+  @media (min-width: 769px) {
+    text-rendering: optimizeLegibility;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+  }
 }
 
 /* ==========================================================================
@@ -119,11 +129,21 @@ body {
   z-index: var(--z-particles);
   pointer-events: none;
   opacity: 0.4;
-  /* 고해상도 렌더링 최적화 */
   will-change: transform;
   transform: translateZ(0);
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
+  
+  /* 모바일에서는 완전히 숨김 */
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.desktop-only {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
 }
 
 /* ==========================================================================
@@ -134,9 +154,12 @@ body {
   position: relative;
   z-index: var(--z-base);
   min-height: 100vh;
-  /* 고해상도 렌더링 최적화 */
-  transform: translateZ(0);
-  will-change: scroll-position;
+  
+  /* 모바일에서는 will-change 제거 */
+  @media (min-width: 769px) {
+    transform: translateZ(0);
+    will-change: scroll-position;
+  }
 }
 
 /* ==========================================================================
@@ -516,9 +539,7 @@ body {
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--color-border-primary);
   border-radius: var(--radius-lg);
-  transform-style: preserve-3d;
   overflow: hidden;
-  will-change: transform;
   
   &::before {
     content: '';
@@ -531,11 +552,24 @@ body {
     opacity: 0;
   }
   
-  &:hover {
-    animation: cardHover 0.3s ease forwards;
+  /* 모바일에서는 hover 효과 제거 */
+  @media (min-width: 769px) {
+    transform-style: preserve-3d;
+    will-change: transform;
     
-    &::before {
-      animation: cardHoverBg 0.3s ease forwards;
+    &:hover {
+      animation: cardHover 0.3s ease forwards;
+      
+      &::before {
+        animation: cardHoverBg 0.3s ease forwards;
+      }
+    }
+  }
+  
+  /* 모바일에서는 간단한 효과만 */
+  @media (max-width: 768px) {
+    &:active {
+      transform: scale(0.98);
     }
   }
 }
@@ -1218,7 +1252,16 @@ body {
   transform: translateY(30px);
   
   &.visible {
-    animation: fadeInUpAnimation 0.6s ease forwards;
+    /* 모바일에서는 애니메이션 간소화 */
+    @media (max-width: 768px) {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    @media (min-width: 769px) {
+      animation: fadeInUpAnimation 0.6s ease forwards;
+    }
   }
 }
 
@@ -1227,12 +1270,20 @@ body {
   transform: translateY(50px);
   
   &.visible {
-    animation: slideUpAnimation 0.8s ease forwards;
+    @media (max-width: 768px) {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    @media (min-width: 769px) {
+      animation: slideUpAnimation 0.8s ease forwards;
+    }
   }
 }
 
 /* ==========================================================================
-   Responsive Design
+   Responsive Design - 모바일 최적화
    ========================================================================== */
 
 @media (max-width: 768px) {
@@ -1243,13 +1294,27 @@ body {
     --spacing-3xl: 4rem;
   }
   
+  /* 모바일에서 불필요한 효과 제거 */
+  * {
+    will-change: auto !important;
+  }
+  
+  /* backdrop-filter 모바일에서 비활성화 (성능) */
+  .post-card-inner,
+  .site-header,
+  .floating-toc {
+    backdrop-filter: none;
+    background: var(--color-bg-secondary);
+  }
+  
   .hero-section {
-    min-height: 80vh;
+    min-height: 70vh;
     padding: var(--spacing-2xl) var(--spacing-md);
   }
   
   .posts-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
   }
   
   .post-content {
@@ -1257,7 +1322,25 @@ body {
   }
   
   .floating-toc {
-    display: none;
+    display: none !important;
+  }
+  
+  /* 모바일에서 애니메이션 최소화 */
+  @media (prefers-reduced-motion: no-preference) {
+    .fade-in.visible,
+    .slide-up.visible {
+      animation: none;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+  }
+  
+  /* 모바일에서 3D 효과 제거 */
+  .post-card {
+    perspective: none;
+  }
+  
+  .post-card-inner {
+    transform-style: flat;
   }
 }
 
