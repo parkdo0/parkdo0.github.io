@@ -2,8 +2,8 @@
 layout: single
 title: "Oracle 쿼리 성능 최적화: 실행 계획 분석과 인덱스 전략"
 date: 2025-12-17 14:00:00 +0900
-categories: Database Oracle
-tags: [Query Tuning, EXPLAIN PLAN, Index, Performance]
+categories: Work-Experience
+tags: [Query Tuning, EXPLAIN PLAN, Index, Performance, Oracle]
 ---
 
 ## 문제 상황

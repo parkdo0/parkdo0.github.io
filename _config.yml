@@ -4,13 +4,13 @@ description: 6년차 백엔드 개발자의 학습 기록
 author:
   name: 박도영
   email: qkrehdudhi@naver.com
-  bio: "6년차 백엔드. SI 경험으로 서비스 기업 준비 중."
+  bio: "6년차 백엔드 개발자"
   location: "Seoul, Korea"
   github: parkdo0
 
 # Theme
 remote_theme: mmistakes/minimal-mistakes@4.24.0
-minimal_mistakes_skin: "dark"
+minimal_mistakes_skin: "contrast"  # dark에서 contrast로 변경 (가독성 up)
 
 # Site Settings
 locale: "ko-KR"
@@ -59,6 +59,10 @@ kramdown:
   toc_levels: 1..6
   smart_quotes: lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    block:
+      line_numbers: true  # 코드 라인 넘버 추가
 
 # Plugins
 plugins:
@@ -95,3 +99,10 @@ defaults:
       share: true
       related: true
       show_date: true
+      toc: true  # 목차 자동 생성
+      toc_label: "목차"
+      toc_icon: "list"
+      toc_sticky: true  # 스크롤 시 목차 고정
+
+# 코드 하이라이팅 개선
+highlighter: rouge
