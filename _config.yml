@@ -8,9 +8,9 @@ author:
   location: "Seoul, Korea"
   github: parkdo0
 
-# Theme
-remote_theme: mmistakes/minimal-mistakes@4.24.0
-minimal_mistakes_skin: "contrast"  # dark에서 contrast로 변경 (가독성 up)
+# Theme - Custom Design (No remote theme)
+# remote_theme: mmistakes/minimal-mistakes@4.24.0
+# minimal_mistakes_skin: "contrast"
 
 # Site Settings
 locale: "ko-KR"
@@ -92,7 +92,7 @@ defaults:
       path: ""
       type: posts
     values:
-      layout: single
+      layout: post
       author_profile: true
       read_time: true
       comments: false

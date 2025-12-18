@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: post
 title: "Spring Boot + JPA + Docker 학습 환경 구축"
 date: 2025-12-17 23:00:00 +0900
 categories: Learning

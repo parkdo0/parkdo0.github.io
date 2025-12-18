@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: post
 title: "Vue3 Composition API와 TypeScript 실전 적용기"
 date: 2025-12-17 16:00:00 +0900
 categories: Frontend Vue3

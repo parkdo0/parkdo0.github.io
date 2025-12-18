@@ -1,5 +1,5 @@
 ---
-layout: single
+layout: post
 title: "개발자가 PM을 하며 배운 프로젝트 관리 기법"
 date: 2025-12-17 18:00:00 +0900
 categories: PM ProjectManagement
