@@ -62,7 +62,7 @@ kramdown:
   syntax_highlighter: rouge
   syntax_highlighter_opts:
     block:
-      line_numbers: true  # 코드 라인 넘버 추가
+      line_numbers: false  # 코드 라인 넘버 제거 (가독성 향상)
 
 # Plugins
 plugins:

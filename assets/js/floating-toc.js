@@ -1,4 +1,4 @@
-// Floating Table of Contents (성능 최적화)
+// Floating Table of Contents (성능 최적화 + 스크롤 따라다니기)
 (function() {
   'use strict';
   
@@ -57,6 +57,28 @@
     }
   }
   
+  // Update TOC position to follow scroll
+  function updateTocPosition() {
+    if (!toc.classList.contains('visible')) return;
+    
+    const windowHeight = window.innerHeight;
+    const tocHeight = toc.offsetHeight;
+    const headerHeight = 80; // 헤더 높이
+    const scrollTop = window.pageYOffset;
+    
+    // TOC가 화면 밖으로 나가지 않도록 제한
+    const maxTop = headerHeight + 20;
+    const minTop = windowHeight - tocHeight - 20;
+    const centerTop = scrollTop + (windowHeight / 2) - (tocHeight / 2);
+    
+    // 범위 내에서 위치 조정
+    let targetTop = Math.max(maxTop, Math.min(minTop, centerTop));
+    
+    // translateY 대신 top 사용 (스크롤 따라다니기)
+    toc.style.top = targetTop + 'px';
+    toc.style.transform = 'none';
+  }
+  
   // Highlight active heading (캐싱으로 최적화)
   const links = tocNav.querySelectorAll('.toc-link');
   function highlightActiveHeading() {
@@ -104,6 +126,7 @@
     if (!ticking) {
       window.requestAnimationFrame(() => {
         checkTocVisibility();
+        updateTocPosition();
         highlightActiveHeading();
         ticking = false;
       });
@@ -112,12 +135,15 @@
   };
   
   window.addEventListener('scroll', scrollHandler, { passive: true });
+  window.addEventListener('resize', updateTocPosition, { passive: true });
   
   // Initial check
   checkTocVisibility();
+  updateTocPosition();
   
   // Cleanup
   window.addEventListener('beforeunload', () => {
     window.removeEventListener('scroll', scrollHandler);
+    window.removeEventListener('resize', updateTocPosition);
   });
 })();
