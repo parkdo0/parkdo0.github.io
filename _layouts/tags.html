@@ -1,0 +1,51 @@
+---
+layout: default
+---
+
+<div class="tags-layout">
+  <div class="container">
+    <header class="tags-header">
+      <h1 class="tags-title">{{ page.title }}</h1>
+    </header>
+    
+    <div class="tags-content">
+      {% assign tags_max = 0 %}
+      {% for tag in site.tags %}
+        {% if tag[1].size > tags_max %}
+          {% assign tags_max = tag[1].size %}
+        {% endif %}
+      {% endfor %}
+      
+      <div class="tags-grid">
+        {% for i in (1..tags_max) reversed %}
+          {% for tag in site.tags %}
+            {% if tag[1].size == i %}
+              <div class="tag-item">
+                <a href="#{{ tag[0] | slugify }}" class="tag-link">
+                  <span class="tag-name">{{ tag[0] }}</span>
+                  <span class="tag-count">{{ i }}</span>
+                </a>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      </div>
+      
+      {% for i in (1..tags_max) reversed %}
+        {% for tag in site.tags %}
+          {% if tag[1].size == i %}
+            <section id="{{ tag[0] | slugify }}" class="tag-section">
+              <h2 class="tag-section-title">{{ tag[0] }}</h2>
+              <div class="tag-posts">
+                {% for post in tag[1] %}
+                  {% include post-card.html post=post %}
+                {% endfor %}
+              </div>
+            </section>
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+

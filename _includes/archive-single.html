@@ -1,0 +1,23 @@
+{% assign post = include.post | default: post %}
+
+<article class="archive-post-card">
+  <div class="archive-post-inner">
+    <time class="archive-post-date" datetime="{{ post.date | date: '%Y-%m-%d' }}">
+      {{ post.date | date: "%Y.%m.%d" }}
+    </time>
+    <h3 class="archive-post-title">
+      <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+    </h3>
+    {% if post.excerpt %}
+    <p class="archive-post-excerpt">{{ post.excerpt | strip_html | truncatewords: 25 }}</p>
+    {% endif %}
+    {% if post.categories %}
+    <div class="archive-post-categories">
+      {% for category in post.categories %}
+        <span class="category-badge">{{ category }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</article>
+

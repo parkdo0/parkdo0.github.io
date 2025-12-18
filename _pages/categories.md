@@ -12,15 +12,15 @@ author_profile: true
   {% endif %}
 {% endfor %}
 
-<h2>📁 전체 카테고리</h2>
+<h2 class="archive-subtitle">📁 전체 카테고리</h2>
 
-<ul class="taxonomy__index">
+<ul class="taxonomy-index">
   {% for i in (1..categories_max) reversed %}
     {% for category in site.categories %}
       {% if category[1].size == i %}
         <li>
           <a href="#{{ category[0] | slugify }}">
-            <strong>{{ category[0] }}</strong> <span class="taxonomy__count">{{ i }}</span>
+            <strong>{{ category[0] }}</strong> <span class="taxonomy-count">{{ i }}</span>
           </a>
         </li>
       {% endif %}
@@ -31,14 +31,14 @@ author_profile: true
 {% for i in (1..categories_max) reversed %}
   {% for category in site.categories %}
     {% if category[1].size == i %}
-      <section id="{{ category[0] | slugify | downcase }}" class="taxonomy__section">
-        <h2 class="archive__subtitle">{{ category[0] }}</h2>
-        <div class="entries-{{ page.entries_layout | default: 'list' }}">
+      <section id="{{ category[0] | slugify | downcase }}" class="taxonomy-section">
+        <h2 class="archive-subtitle">{{ category[0] }}</h2>
+        <div class="archive-posts-grid">
           {% for post in category[1] %}
-            {% include archive-single.html type=page.entries_layout %}
+            {% include archive-single.html post=post %}
           {% endfor %}
         </div>
-        <a href="#page-title" class="back-to-top">⬆️ 맨 위로</a>
+        <a href="#page-title" class="back-to-top">↑ 맨 위로</a>
       </section>
     {% endif %}
   {% endfor %}
