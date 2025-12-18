@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "JPA Docker 학습 Day 1"
-date: 2025-12-18 23:00:00 +0900
-categories: ["JPA", "Docker"]
+date: 2025-12-17 23:00:00 +0900
+categories: [JPA, Docker]
 ---
 
 ## 배경
