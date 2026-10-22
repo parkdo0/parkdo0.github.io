@@ -1,0 +1,10 @@
+<header class="site-header">
+  <div class="header-inner">
+    <a href="{{ '/' | relative_url }}" class="logo">{{ site.author.name }}<span class="logo-sub"> 기술 블로그</span></a>
+    <nav class="nav">
+      {% for item in site.data.navigation.main %}
+      <a href="{{ item.url | relative_url }}" class="nav-link{% if page.url == item.url %} is-active{% endif %}">{{ item.title }}</a>
+      {% endfor %}
+    </nav>
+  </div>
+</header>

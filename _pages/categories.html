@@ -1,0 +1,17 @@
+---
+layout: archive
+title: "카테고리"
+permalink: /categories/
+---
+<div class="chips">
+{% for c in site.data.categories %}{% assign ckey = c[0] %}{% assign cps = site.posts | where_exp: "p", "p.categories contains ckey" %}{% if cps.size > 0 %}<a class="chip" href="#{{ ckey | slugify }}">{{ c[1] }} <span>{{ cps.size }}</span></a>{% endif %}{% endfor %}
+</div>
+{% for c in site.data.categories %}{% assign ckey = c[0] %}
+  {% assign cps = site.posts | where_exp: "p", "p.categories contains ckey" | sort: 'order' | reverse %}
+  {% if cps.size > 0 %}
+  <section class="group" id="{{ ckey | slugify }}">
+    <h2 class="group-title">{{ c[1] }} <span class="group-count">{{ cps.size }}</span></h2>
+    <div class="post-list">{% for post in cps %}{% include post-card.html post=post %}{% endfor %}</div>
+  </section>
+  {% endif %}
+{% endfor %}

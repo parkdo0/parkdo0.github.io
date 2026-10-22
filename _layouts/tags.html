@@ -1,0 +1,21 @@
+---
+layout: default
+---
+<section class="page container">
+  <h1 class="page-title">{{ page.title }}</h1>
+  {% for g in site.data.tags %}
+  <div class="tag-group">
+    <p class="tag-group-label">{{ g.group }}</p>
+    <div class="chips">
+      {% for t in g.items %}{% if site.tags[t] %}<a class="chip" href="#{{ t | slugify }}">{{ t }} <span>{{ site.tags[t].size }}</span></a>{% endif %}{% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+  {% for g in site.data.tags %}{% for t in g.items %}{% if site.tags[t] %}
+  {% assign tps = site.tags[t] | sort: 'order' | reverse %}
+  <section class="group" id="{{ t | slugify }}">
+    <h2 class="group-title">#{{ t }} <span class="group-count">{{ tps.size }}</span></h2>
+    <div class="post-list">{% for post in tps %}{% include post-card.html post=post %}{% endfor %}</div>
+  </section>
+  {% endif %}{% endfor %}{% endfor %}
+</section>

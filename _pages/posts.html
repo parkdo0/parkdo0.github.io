@@ -1,0 +1,10 @@
+---
+layout: archive
+title: "전체 글"
+permalink: /posts/
+---
+{% assign sorted_posts = site.posts | sort: 'order' | reverse %}
+<p class="list-hint">최근에 한 일부터</p>
+<div class="post-list">
+  {% for post in sorted_posts %}{% include post-card.html post=post %}{% endfor %}
+</div>

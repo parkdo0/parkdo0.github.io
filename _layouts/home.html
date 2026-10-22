@@ -1,0 +1,25 @@
+---
+layout: default
+---
+{% assign sorted_posts = site.posts | sort: 'order' | reverse %}
+<section class="hero">
+  <div class="container">
+    <p class="hero-eyebrow">회고 기록</p>
+    <h1 class="hero-title">{{ site.author.name }}</h1>
+    <p class="hero-desc">{{ content | strip_html | strip }}</p>
+  </div>
+</section>
+
+<section class="container">
+  <div class="chips">
+    <a class="chip is-active" href="{{ '/posts/' | relative_url }}">전체 <span>{{ site.posts.size }}</span></a>
+    {% for c in site.data.categories %}{% assign ckey = c[0] %}
+      {% assign cps = site.posts | where_exp: "p", "p.categories contains ckey" %}
+      {% if cps.size > 0 %}<a class="chip" href="{{ '/categories/' | relative_url }}#{{ ckey | slugify }}">{{ c[1] }} <span>{{ cps.size }}</span></a>{% endif %}
+    {% endfor %}
+  </div>
+  <p class="list-hint">최근에 한 일부터</p>
+  <div class="post-list">
+    {% for post in sorted_posts %}{% include post-card.html post=post %}{% endfor %}
+  </div>
+</section>

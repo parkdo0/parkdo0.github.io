@@ -1,0 +1,5 @@
+# 태그는 이 목록에 있는 것만 쓴다
+- group: "기술"
+  items: [Oracle, SQL, Spring, Vue, React, Next.js, Python, Linux, Git]
+- group: "주제"
+  items: [데이터 정합성, 트러블슈팅, 설계, 배치, 외부 연동, 성능, 레거시, 인프라, 자동화, 문서화, 프로세스, AI 협업]

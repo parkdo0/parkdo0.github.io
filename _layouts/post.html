@@ -1,0 +1,35 @@
+---
+layout: default
+---
+{% assign cat = page.categories | first %}
+<article class="post container">
+  <header class="post-head">
+    <div class="post-meta">
+      {% if cat %}<a class="post-cat" href="{{ '/categories/' | relative_url }}#{{ cat | slugify }}">{{ site.data.categories[cat] | default: cat }}</a>{% endif %}
+      {% if page.period %}<span class="dot">·</span><span>{{ page.period }}</span>{% endif %}
+    </div>
+    <h1 class="post-title">{{ page.title }}</h1>
+    {% if page.description %}<p class="post-lead">{{ page.description }}</p>{% endif %}
+    {% if page.tags.size > 0 %}
+    <div class="post-tags">{% for tag in page.tags %}<a class="tag" href="{{ '/tags/' | relative_url }}#{{ tag | slugify }}">#{{ tag }}</a>{% endfor %}</div>
+    {% endif %}
+  </header>
+
+  <div class="post-body">
+    {{ content }}
+  </div>
+
+  <p class="post-written">{{ page.date | date: "%Y년 %-m월 %-d일" }}에 정리</p>
+
+  {% assign sorted_posts = site.posts | sort: 'order' | reverse %}
+  {% for p in sorted_posts %}{% if p.url == page.url %}{% assign idx = forloop.index0 %}{% endif %}{% endfor %}
+  {% assign newer_i = idx | minus: 1 %}{% assign older_i = idx | plus: 1 %}
+  <nav class="post-nav">
+    {% if idx > 0 %}{% assign np = sorted_posts[newer_i] %}
+    <a class="post-nav-item" href="{{ np.url | relative_url }}"><span class="post-nav-label">더 최근에 한 일</span><span class="post-nav-title">{{ np.title }}</span></a>
+    {% else %}<span></span>{% endif %}
+    {% if older_i < sorted_posts.size %}{% assign op = sorted_posts[older_i] %}
+    <a class="post-nav-item is-next" href="{{ op.url | relative_url }}"><span class="post-nav-label">그 전에 한 일</span><span class="post-nav-title">{{ op.title }}</span></a>
+    {% endif %}
+  </nav>
+</article>

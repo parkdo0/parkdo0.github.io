@@ -1,0 +1,11 @@
+{% assign p = include.post %}
+{% assign cat = p.categories | first %}
+<a class="post-row" href="{{ p.url | relative_url }}">
+  <div class="post-row-meta">
+    {% if cat %}<span class="post-row-cat">{{ site.data.categories[cat] | default: cat }}</span>{% endif %}
+    {% if p.period %}<span class="post-row-period">{{ p.period }}</span>{% endif %}
+  </div>
+  <h3 class="post-row-title">{{ p.title }}</h3>
+  <p class="post-row-desc">{% if p.description %}{{ p.description }}{% else %}{{ p.content | strip_html | strip_newlines | truncate: 120 }}{% endif %}</p>
+  {% if p.tags.size > 0 %}<div class="post-row-tags">{% for t in p.tags %}<span>#{{ t }}</span>{% endfor %}</div>{% endif %}
+</a>

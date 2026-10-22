@@ -1,0 +1,10 @@
+# Main Navigation
+main:
+  - title: "글"
+    url: /posts/
+  - title: "카테고리"
+    url: /categories/
+  - title: "태그"
+    url: /tags/
+  - title: "소개"
+    url: /about/
